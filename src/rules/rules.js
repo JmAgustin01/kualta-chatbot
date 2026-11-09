@@ -326,7 +326,11 @@ export const rules = [
       /\b(nba|pba|basketball|football|lotto|horoscope|recipe|movie|showtimes)\b/,
       /\bwho won\b/,
       /\b(news today|latest news|stock price|bitcoin price)\b/,
+      // General knowledge: "who is the president of the Philippines", "capital of Japan".
+      /\b(president|prime minister|vice president|senator|governor|mayor|king|queen|pope)\b.*\b(of|ng)\b/,
+      /\b(capital|population) of\b/,
     ],
-    respond: () => "I can only help with questions about Kualta Agency's services. Is there anything about our work I can help with?",
+    // "who is the president of Kualta?" is about the agency, not general knowledge.
+    respond: (ctx, text) => /\b(kualta|your|you|ur|agency|company)\b/.test(text) ? null : "I can only help with questions about Kualta Agency's services. Is there anything about our work I can help with?",
   },
 ];

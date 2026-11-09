@@ -59,6 +59,19 @@ export function fallbackMessage(business = config.business) {
  *
  * @returns {Promise<{ text, route:'rag'|'fallback', handoff:boolean, sources:string[], topSimilarity:number|null, reason?:string, usage?:object }>}
  */
+/**
+ * Customers say "your company" / "you guys" / "the agency" (often misspelled) where the
+ * knowledge base says "Kualta Agency". Name the agency in the search query so these
+ * questions retrieve the right chunks. Only the search query changes; the model still
+ * sees the customer's own words.
+ */
+export function searchQuery(question) {
+  return question
+    .replace(/\b(you|your|ur|yur|yo?ure?)\s+(guys|team|c[oa]m?p?a?n[yi]e?s?|comapany|compnay|agency|agecny|business|firm)\b/gi, 'Kualta Agency')
+    .replace(/\bthe (company|agency|business|firm)\b/gi, 'Kualta Agency')
+    .replace(/\byou guys\b/gi, 'Kualta Agency');
+}
+
 export async function answerWithRag(question, {
   embed = defaultEmbed,
   search = defaultSearch,
@@ -70,7 +83,7 @@ export async function answerWithRag(question, {
   logger = console,
 } = {}) {
   try {
-    const [vector] = await embed(question, { taskType: 'RETRIEVAL_QUERY' });
+    const [vector] = await embed(searchQuery(question), { taskType: 'RETRIEVAL_QUERY' });
     const hits = await search(vector, { topK });
     const topSimilarity = hits.length ? hits[0].similarity : null;
     const relevant = hits.filter((h) => h.similarity >= threshold);
