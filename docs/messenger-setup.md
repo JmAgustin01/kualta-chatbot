@@ -30,7 +30,7 @@ Also leave **Meta Business Agent** (Meta's AI replies) off.
 2. **App settings → Basic**: copy **App ID** → `META_APP_ID` and **App secret** → `META_APP_SECRET`.
 3. **Messenger → Messenger API settings**: connect the demo Page, then **Generate token**
    → `MESSENGER_PAGE_ACCESS_TOKEN`. Treat it like a password; it only goes into Render.
-4. Note the **Graph API version** shown in the dashboard → `GRAPH_API_VERSION` (e.g. v24.0).
+4. Note the **Graph API version** shown in the dashboard → `GRAPH_API_VERSION` (e.g. v25.0).
 
 ## 4. Connect the webhook (after Render is live)
 1. In Render, make sure `/health` returns `{"ok":true}` and these env vars are set:

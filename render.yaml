@@ -22,7 +22,7 @@ services:
       - key: SIMILARITY_THRESHOLD
         value: "0.35"
       - key: GRAPH_API_VERSION
-        value: v24.0
+        value: v25.0
       - key: HUMAN_PAUSE_HOURS
         value: "12"
       # Secrets: set these in the Render dashboard, never in this file

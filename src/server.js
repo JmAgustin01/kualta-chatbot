@@ -47,4 +47,14 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     if (missing.length) console.warn(`[startup] ${feature} not fully configured, missing: ${missing.join(', ')}`);
   }
   createApp().listen(config.port, () => console.log(`Kualta chatbot listening on :${config.port}`));
+
+  // Load /knowledge into Supabase if it changed since the last deploy (no cost when unchanged).
+  if (!missingFor('ingest').length) {
+    const [{ ensureKnowledge }, { getSupabase }, { embedBatched }] = await Promise.all([
+      import('./rag/autoIngest.js'),
+      import('./rag/vectorStore.js'),
+      import('./rag/embeddings.js'),
+    ]);
+    ensureKnowledge({ supabase: getSupabase(), embedBatched }).catch((err) => console.error('[kb] auto-load failed:', err.message));
+  }
 }

@@ -84,7 +84,7 @@ tests/                 unit tests + test-set.json
 ```bash
 npm install
 cp .env.example .env     # fill in keys as you get them
-npm test                 # 69 tests, no keys needed
+npm test                 # 71 tests, no keys needed
 ```
 
 ### 2. Supabase (free)
@@ -98,7 +98,11 @@ npm test                 # 69 tests, no keys needed
 - Gemini: aistudio.google.com → Get API key → `GEMINI_API_KEY`.
 
 ### 4. Load the knowledge base
-`/knowledge` already holds `services.md`, `policies.md` and `privacy.md` from the Business Rules doc. Add more pages (About, FAQ) the same way, then:
+`/knowledge` already holds `services.md`, `policies.md` and `privacy.md` from the Business Rules doc.
+**On Render you don't need to do anything:** when the bot starts it checks whether these files
+changed since the last deploy and, if so, embeds and loads them into Supabase automatically
+(no API cost when nothing changed). To add pages (About, FAQ), commit them to `/knowledge` and
+push. To preview chunking or load from your own computer instead:
 ```bash
 npm run ingest -- --dry-run   # inspect chunks
 npm run ingest

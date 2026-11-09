@@ -32,7 +32,7 @@ export const config = {
 
   messenger: {
     // Graph API version shown in your Meta app dashboard
-    apiVersion: process.env.GRAPH_API_VERSION || 'v24.0',
+    apiVersion: process.env.GRAPH_API_VERSION || 'v25.0',
     pageAccessToken: process.env.MESSENGER_PAGE_ACCESS_TOKEN || '',
     verifyToken: process.env.META_VERIFY_TOKEN || '',
     appSecret: process.env.META_APP_SECRET || '',
