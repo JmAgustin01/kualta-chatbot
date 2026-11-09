@@ -1,0 +1,22 @@
+{
+  "name": "kualta-chatbot",
+  "version": "1.0.0",
+  "description": "Rules-first RAG support chatbot for Kualta Agency (Facebook Messenger + Supabase pgvector + Gemini Flash)",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "ingest": "node scripts/ingest.js",
+    "eval": "node scripts/run-eval.js",
+    "test": "node --test \"tests/**/*.test.js\""
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  }
+}

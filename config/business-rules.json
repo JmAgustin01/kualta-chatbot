@@ -1,0 +1,72 @@
+{
+  "_readme": "Business rules from 'Kualta Agency - Business Rules' (Team Greek AI, Nov 8 2026). The bot quotes these word for word. Any value left empty makes the bot hand off to a human for that topic. Never put placeholder text like TODO in a value.",
+
+  "services_BR03": [
+    "Social media management",
+    "Paid ads management",
+    "SEO",
+    "Content creation",
+    "Branding package",
+    "Website design"
+  ],
+
+  "consultation_BR04": {
+    "offer": "We offer a free 30-minute online consultation (Google Meet) before any quotation."
+  },
+
+  "pricing_BR05": {
+    "priceList": [
+      { "service": "Social media management", "startingAt": "₱15,000/month", "keywords": ["social media", "socmed", "facebook page", "instagram", "community"] },
+      { "service": "Content creation", "startingAt": "₱8,000/month", "keywords": ["content", "graphics", "videos", "reels", "posts"] },
+      { "service": "Paid ads management", "startingAt": "₱10,000/month + ad spend", "keywords": ["ads", "advertising", "meta ads", "google ads", "facebook ads", "ppc"] },
+      { "service": "SEO", "startingAt": "₱12,000/month", "keywords": ["seo", "search engine", "ranking", "google search"] },
+      { "service": "Branding package", "startingAt": "₱25,000 one-time", "keywords": ["branding", "brand", "logo", "brand guide"] },
+      { "service": "Website design", "startingAt": "₱35,000 one-time", "keywords": ["website", "web design", "site", "wordpress", "web site"] }
+    ],
+    "quotationNote": "All rates are starting prices in PHP, VAT-exclusive. Your final price comes from a written quotation after the consultation."
+  },
+
+  "discounts_BR07": {
+    "reply": "I can't offer or promise discounts. Pricing is set in a written quotation after your free consultation. I'll pass your question to our team."
+  },
+
+  "policies_BR09_BR19": {
+    "payment": "A 50% non-refundable deposit is due on signing; the balance is due before final files or account access are handed over. Monthly retainers are billed in advance and due by the 5th of each month. Accounts unpaid 15 days past due are paused until settled. Paid-ad budgets are paid by the client directly to the ad platform and are separate from Kualta's management fee.",
+    "revision": "Each deliverable includes 2 revision rounds. Extra rounds cost ₱1,500 each; scope changes are quoted separately.",
+    "cancellation": "Retainers can be cancelled with 30 days' written notice. One-off projects cancelled mid-work are billed for work completed; the deposit is not refunded.",
+    "ownership": "Final files and IP transfer to the client only after full payment. Kualta may show the work in its portfolio unless the client opts out in writing."
+  },
+
+  "results_BR16": {
+    "reply": "Kualta doesn't guarantee specific results like followers, rankings or sales. We commit to the agreed deliverables and regular reporting, and retainer clients get a monthly performance report."
+  },
+
+  "hours_BR02": {
+    "_note": "days: 1=Mon .. 7=Sun. holidays: list of YYYY-MM-DD dates (PH public holidays) when the team is closed.",
+    "timezone": "Asia/Manila",
+    "days": [1, 2, 3, 4, 5],
+    "open": "09:00",
+    "close": "18:00",
+    "holidays": [],
+    "label": "Monday to Friday, 9:00 AM to 6:00 PM (Philippine time)",
+    "afterHoursReply": "Our team is offline right now (Monday to Friday, 9:00 AM to 6:00 PM, Philippine time). A human will reply within 1 business day."
+  },
+
+  "privacy_BR20": {
+    "notice": "Kualta Agency collects your name, email, phone number and business name only to reply to your inquiry and schedule a consultation. We follow the Data Privacy Act of 2012 (RA 10173), keep chat records for up to 12 months, and never sell or share your data. To view, correct or delete your data, reply 'DELETE MY DATA' or ask our team.",
+    "noticeUrl": ""
+  },
+
+  "prohibited_BR21": {
+    "reply": "For your security, please don't send passwords, logins, card numbers or bank details in this chat. I haven't saved it. Our team will tell you the official, secure way to share account access when your project starts."
+  },
+
+  "complaints_BR22": {
+    "reply": "I'm sorry about this. I've escalated it to your account manager, who will get back to you within 1 business day."
+  },
+
+  "booking": {
+    "_note": "Booking page URL (Calendly / Google Calendar appointment page). It handles slots within business hours and emails the confirmation (CB-10). Leave empty and the bot says the team will email to schedule.",
+    "url": ""
+  }
+}
