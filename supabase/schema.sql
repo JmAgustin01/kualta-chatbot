@@ -1,6 +1,6 @@
 -- Run once in Supabase: Dashboard > SQL Editor > New query > paste > Run.
 
-create extension if not exists vector;
+create extension if not exists vector with schema extensions;
 
 create table if not exists public.documents (
   id          uuid primary key default gen_random_uuid(),
@@ -28,6 +28,7 @@ create or replace function public.match_documents (
 )
 returns table (id uuid, source text, title text, content text, similarity float)
 language sql stable
+set search_path = public, extensions
 as $$
   select d.id, d.source, d.title, d.content,
          1 - (d.embedding <=> query_embedding) as similarity
@@ -93,6 +94,7 @@ alter table public.message_logs  enable row level security;
 create or replace function public.delete_user_data (p_user_key text)
 returns jsonb
 language plpgsql
+set search_path = public
 as $$
 declare n_leads int; n_logs int;
 begin
@@ -107,6 +109,7 @@ $$;
 create or replace function public.purge_expired_data ()
 returns jsonb
 language plpgsql
+set search_path = public
 as $$
 declare n_leads int; n_logs int; n_sessions int;
 begin
@@ -116,6 +119,9 @@ begin
   return jsonb_build_object('leads', n_leads, 'logs', n_logs, 'sessions', n_sessions);
 end;
 $$;
+
+-- Second layer behind RLS: the public (anon) key gets no table rights at all.
+revoke all on table public.documents, public.chat_sessions, public.leads, public.message_logs from anon, authenticated;
 
 revoke all on function public.delete_user_data(text)  from public, anon, authenticated;
 revoke all on function public.purge_expired_data()    from public, anon, authenticated;
