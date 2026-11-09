@@ -70,7 +70,7 @@ export async function answerWithRag(question, {
   logger = console,
 } = {}) {
   try {
-    const [vector] = await embed(question);
+    const [vector] = await embed(question, { taskType: 'RETRIEVAL_QUERY' });
     const hits = await search(vector, { topK });
     const topSimilarity = hits.length ? hits[0].similarity : null;
     const relevant = hits.filter((h) => h.similarity >= threshold);

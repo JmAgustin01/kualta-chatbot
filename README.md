@@ -3,7 +3,7 @@
 Rules-first RAG chatbot on the demo **Facebook Page's Messenger**, connected through Meta's
 Messenger webhook ([docs/messenger-setup.md](docs/messenger-setup.md)). When the bot hands off,
 the team answers from the Business Suite inbox and the bot steps aside for that customer.
-No AWS. Hosting, database and LLM are on free tiers; OpenAI embeddings cost cents.
+No AWS, and $0 to run: hosting, database, embeddings and the LLM are all on free tiers.
 
 ```
 Messenger user
@@ -15,7 +15,7 @@ Express on Render ── 1. Screen: prohibited data (CB-17), abuse (CB-18)
                        (pricing, policies, discounts, results, complaints, services…)
                          │ no match
                          ▼
-                    1. Embed question (OpenAI text-embedding-3-small)
+                    1. Embed question (Gemini gemini-embedding-001, 1536 dims)
                     2. Search Supabase pgvector (top-K, similarity ≥ threshold)
                          │ nothing relevant? → fallback + handoff, NO LLM call
                          ▼
@@ -63,7 +63,7 @@ src/
   chat.js              rules → RAG orchestration (one entry point for all channels)
   rules/rules.js       the rule list (edit here)
   rules/engine.js      normalizer + matcher
-  rag/embeddings.js    OpenAI embeddings
+  rag/embeddings.js    Gemini embeddings (OpenAI optional via EMBEDDING_PROVIDER)
   rag/vectorStore.js   Supabase pgvector search + upsert
   rag/llm.js           Gemini REST call
   rag/pipeline.js      retrieval + restricted generation + fallbacks
@@ -94,7 +94,6 @@ npm test                 # 71 tests, no keys needed
 4. Project Settings → API → copy **Project URL** → `SUPABASE_URL`, **service_role** key → `SUPABASE_SERVICE_ROLE_KEY`.
 
 ### 3. API keys
-- OpenAI: platform.openai.com → API keys → `OPENAI_API_KEY` (add ~$5 credit; embeddings for this KB cost well under $0.01).
 - Gemini: aistudio.google.com → Get API key → `GEMINI_API_KEY`.
 
 ### 4. Load the knowledge base

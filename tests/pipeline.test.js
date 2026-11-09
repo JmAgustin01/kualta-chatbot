@@ -107,3 +107,35 @@ test('llm: retries without thinkingConfig if the API rejects it', async () => {
   assert.equal(bodies.length, 2);
   assert.equal(bodies[1].generationConfig.thinkingConfig, undefined);
 });
+
+import { embed as geminiEmbed, embedBatched, embeddingModelId } from '../src/rag/embeddings.js';
+
+test('gemini embeddings: query vs document task types, 1536 dims, one call per text', async () => {
+  const bodies = [];
+  const fetchFn = async (url, opts) => {
+    bodies.push({ url, body: JSON.parse(opts.body) });
+    return { ok: true, json: async () => ({ embedding: { values: new Array(1536).fill(0.01) } }) };
+  };
+  const cfg = { provider: 'gemini', geminiModel: 'gemini-embedding-001', geminiApiKey: 'k' };
+  const [q] = await geminiEmbed('how much is seo', { cfg, fetchFn });
+  assert.equal(q.length, 1536);
+  assert.equal(bodies[0].body.taskType, 'RETRIEVAL_QUERY');
+  assert.equal(bodies[0].body.outputDimensionality, 1536);
+  assert.match(bodies[0].url, /gemini-embedding-001:embedContent$/);
+
+  const docs = await embedBatched(['a', 'b', 'c'], 2, { cfg, fetchFn });
+  assert.equal(docs.length, 3);
+  assert.ok(bodies.slice(1).every((b) => b.body.taskType === 'RETRIEVAL_DOCUMENT'));
+});
+
+test('gemini embeddings reject a wrong vector size instead of storing it', async () => {
+  const fetchFn = async () => ({ ok: true, json: async () => ({ embedding: { values: [1, 2, 3] } }) });
+  await assert.rejects(geminiEmbed('x', { cfg: { provider: 'gemini', geminiModel: 'm', geminiApiKey: 'k' }, fetchFn }), /expected 1536/);
+});
+
+test('changing the embedding model changes the knowledge fingerprint', () => {
+  assert.notEqual(
+    embeddingModelId({ provider: 'gemini', geminiModel: 'gemini-embedding-001' }),
+    embeddingModelId({ provider: 'openai', openaiModel: 'text-embedding-3-small' }),
+  );
+});

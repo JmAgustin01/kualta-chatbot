@@ -8,9 +8,13 @@ const num = (v, fallback) => {
 export const config = {
   port: num(process.env.PORT, 3000),
 
-  openai: {
-    apiKey: process.env.OPENAI_API_KEY || '',
-    embeddingModel: process.env.EMBEDDING_MODEL || 'text-embedding-3-small',
+  embeddings: {
+    // gemini (default, free tier) or openai (needs credit)
+    provider: (process.env.EMBEDDING_PROVIDER || 'gemini').toLowerCase(),
+    geminiModel: process.env.GEMINI_EMBEDDING_MODEL || 'gemini-embedding-001',
+    geminiApiKey: process.env.GEMINI_API_KEY || '',
+    openaiModel: process.env.EMBEDDING_MODEL || 'text-embedding-3-small',
+    openaiApiKey: process.env.OPENAI_API_KEY || '',
   },
 
   gemini: {
@@ -53,11 +57,13 @@ export const config = {
   },
 };
 
+const embeddingProvider = () => (process.env.EMBEDDING_PROVIDER || 'gemini').toLowerCase();
+
 /** Returns the names of required env vars that are missing for a given feature. */
 export function missingFor(feature) {
   const req = {
-    rag: ['OPENAI_API_KEY', 'GEMINI_API_KEY', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'],
-    ingest: ['OPENAI_API_KEY', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'],
+    rag: ['GEMINI_API_KEY', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', ...(embeddingProvider() === 'openai' ? ['OPENAI_API_KEY'] : [])],
+    ingest: ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', ...(embeddingProvider() === 'openai' ? ['OPENAI_API_KEY'] : ['GEMINI_API_KEY'])],
     messenger: ['MESSENGER_PAGE_ACCESS_TOKEN', 'META_VERIFY_TOKEN', 'META_APP_SECRET', 'META_APP_ID'],
   }[feature] || [];
   return req.filter((k) => !process.env[k]);

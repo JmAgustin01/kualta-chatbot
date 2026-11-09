@@ -3,13 +3,15 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadKnowledge } from './knowledge.js';
+import { embeddingModelId } from './embeddings.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const KNOWLEDGE_DIR = path.resolve(here, '..', '..', 'knowledge');
 
 /** Fingerprint of everything that would be ingested (file names + chunk text). */
-export function knowledgeHash(docs) {
+export function knowledgeHash(docs, model = embeddingModelId()) {
   const h = crypto.createHash('sha256');
+  h.update(`${model}\u0000`); // a different embedding model means every vector must be redone
   for (const d of docs) h.update(`${d.source}\u0000${d.content}\u0000`);
   return h.digest('hex').slice(0, 16);
 }
