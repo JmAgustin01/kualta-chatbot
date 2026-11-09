@@ -3,6 +3,7 @@ services:
     name: kualta-chatbot
     runtime: node
     plan: free
+    region: singapore
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /health
@@ -49,6 +50,4 @@ services:
       - key: CONTACT_EMAIL
         sync: false
       - key: CONTACT_PHONE
-        sync: false
-      - key: BUSINESS_HOURS
         sync: false
