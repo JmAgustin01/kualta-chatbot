@@ -210,6 +210,20 @@ async function decide(text, norm, s, ctx, opts, store, userKey, channel, now) {
   const failed = negative || rag.route === 'fallback';
   const failCount = failed ? (s.failCount ?? 0) + 1 : 0;
 
+  // --- Temporary AI outage: say so honestly; repeated failures still escalate below
+  if (rag?.reason === 'error' && failCount < FAILS_BEFORE_ESCALATION) {
+    return {
+      route: 'fallback',
+      ruleId: 'ai_unavailable',
+      intent: 'ai_unavailable',
+      text: "Sorry, I'm having trouble answering right now. Please try again in a minute, or type HUMAN to reach our team.",
+      handoff: false,
+      sources: [],
+      topSimilarity: null,
+      session: { ...s, failCount },
+    };
+  }
+
   // --- 4. Escalate (CB-16)
   if (failed && (failCount >= FAILS_BEFORE_ESCALATION || rag?.reason === 'below_threshold' || rag?.reason === 'error')) {
     const after = ctx.open === false ? ` ${ctx.br.hours.afterHoursReply ?? 'A human will reply within 1 business day.'}` : '';

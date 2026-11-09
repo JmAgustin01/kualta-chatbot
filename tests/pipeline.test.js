@@ -139,3 +139,21 @@ test('changing the embedding model changes the knowledge fingerprint', () => {
     embeddingModelId({ provider: 'openai', openaiModel: 'text-embedding-3-small' }),
   );
 });
+
+test('llm: on 429/503 the next model is tried; other errors are not retried', async () => {
+  const tried = [];
+  const fetchFn = async (url) => {
+    const m = url.match(/models\/([^:]+):/)[1];
+    tried.push(m);
+    if (m === 'main') return { ok: false, status: 429, text: async () => 'quota' };
+    if (m === 'lite') return { ok: false, status: 503, text: async () => 'overloaded' };
+    return { ok: true, status: 200, json: async () => ({ candidates: [{ content: { parts: [{ text: 'hi' }] } }] }) };
+  };
+  const r = await generate({ system: 's', user: 'u' }, { apiKey: 'k', model: 'main', fallbackModels: ['lite', 'old'], maxOutputTokens: 100, thinkingLevel: '', fetchFn, logger: {} });
+  assert.equal(r.text, 'hi');
+  assert.equal(r.model, 'old');
+  assert.deepEqual(tried, ['main', 'lite', 'old']);
+
+  const bad = async () => ({ ok: false, status: 403, text: async () => 'forbidden' });
+  await assert.rejects(generate({ system: 's', user: 'u' }, { apiKey: 'k', model: 'main', fallbackModels: ['lite'], maxOutputTokens: 100, thinkingLevel: '', fetchFn: bad, logger: {} }), /403/);
+});

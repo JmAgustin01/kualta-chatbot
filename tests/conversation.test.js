@@ -244,3 +244,19 @@ test('during business hours, booking without a booking URL promises an email', a
   assert.match(r.text, /will email juan@example\.com/);
   assert.doesNotMatch(r.text, /offline/);
 });
+
+test('AI outage: honest "try again" first, escalation on the second failure', async () => {
+  const { say } = conversation({ rag: { embed: async () => { throw new Error('Gemini 429'); } } });
+  const a = await say('Tell me about Kualta Agency');
+  assert.equal(a.ruleId, 'ai_unavailable');
+  assert.equal(a.handoff, false);
+  assert.match(a.text, /try again in a minute/);
+  const b = await say('Tell me about the agency');
+  assert.equal(b.handoff, true);
+});
+
+test('typing just HUMAN reaches the team', async () => {
+  const { say } = conversation();
+  const r = await say('HUMAN');
+  assert.equal(r.ruleId, 'human_handoff');
+});

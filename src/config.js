@@ -20,6 +20,11 @@ export const config = {
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || '',
     model: process.env.GEMINI_MODEL || 'gemini-3.6-flash',
+    // Tried in order when the main model is rate-limited or overloaded (each has its own free quota)
+    fallbackModels: (process.env.GEMINI_FALLBACK_MODELS || 'gemini-3.5-flash-lite,gemini-2.5-flash-lite')
+      .split(',')
+      .map((m) => m.trim())
+      .filter(Boolean),
     maxOutputTokens: num(process.env.MAX_OUTPUT_TOKENS, 1024),
     thinkingLevel: process.env.GEMINI_THINKING_LEVEL ?? 'low',
   },

@@ -99,6 +99,7 @@ export const rules = [
       /\b(real|live) (person|human|agent)\b/,
       /\b(customer service|operator)\b/,
       /\b(kausap|makausap) (ng |ang )?(tao|staff|agent)\b/,
+      /^(human|agent|person|tao)$/,
     ],
     respond: (ctx) => ({ text: `Sure, I'll pass you to our team.${handoffTail(ctx)}`, action: 'handoff' }),
   },

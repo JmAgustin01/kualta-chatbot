@@ -16,12 +16,31 @@ const BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 export async function generate({ system, user }, {
   apiKey = config.gemini.apiKey,
   model = config.gemini.model,
+  fallbackModels = config.gemini.fallbackModels,
   maxOutputTokens = config.gemini.maxOutputTokens,
   thinkingLevel = config.gemini.thinkingLevel,
   fetchFn = fetch,
+  logger = console,
 } = {}) {
   if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
+  // Each Gemini model has its own free-tier quota. If one is rate-limited (429) or
+  // overloaded (5xx), try the next instead of failing the customer's message.
+  const models = [model, ...fallbackModels.filter((m) => m && m !== model)];
+  let lastError;
+  for (const m of models) {
+    try {
+      return await generateWith(m, { system, user, apiKey, maxOutputTokens, thinkingLevel, fetchFn });
+    } catch (err) {
+      lastError = err;
+      if (!err.retryable) throw err;
+      logger.warn?.(`[llm] ${m} unavailable (${err.status}); trying next model`);
+    }
+  }
+  throw lastError;
+}
+
+async function generateWith(model, { system, user, apiKey, maxOutputTokens, thinkingLevel, fetchFn }) {
   const call = async (withThinking) => {
     const generationConfig = { maxOutputTokens };
     if (withThinking && thinkingLevel) generationConfig.thinkingConfig = { thinkingLevel };
@@ -40,12 +59,9 @@ export async function generate({ system, user }, {
   if (res.status === 400 && thinkingLevel) {
     const body = await res.text().catch(() => '');
     if (/thinking/i.test(body)) res = await call(false);
-    else throw new Error(`Gemini failed: 400 ${body.slice(0, 500)}`);
+    else throw httpError(model, 400, body);
   }
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(`Gemini failed: ${res.status} ${body.slice(0, 500)}`);
-  }
+  if (!res.ok) throw httpError(model, res.status, await res.text().catch(() => ''));
 
   const json = await res.json();
   const text = (json.candidates?.[0]?.content?.parts ?? [])
@@ -53,5 +69,12 @@ export async function generate({ system, user }, {
     .map((p) => p.text ?? '')
     .join('')
     .trim();
-  return { text, usage: json.usageMetadata ?? null };
+  return { text, usage: json.usageMetadata ?? null, model };
+}
+
+function httpError(model, status, body) {
+  const err = new Error(`Gemini ${model} failed: ${status} ${String(body).slice(0, 300)}`);
+  err.status = status;
+  err.retryable = status === 429 || status >= 500;
+  return err;
 }
