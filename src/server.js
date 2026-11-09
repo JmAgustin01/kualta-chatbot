@@ -2,10 +2,16 @@ import crypto from 'node:crypto';
 import express from 'express';
 import { config, missingFor } from './config.js';
 import { handleMessage } from './chat.js';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { messengerRouter } from './channels/messenger.js';
+import { webChatRouter } from './channels/web.js';
+
+const publicDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public');
 
 export function createApp({ handle = handleMessage, chatApiKey = config.chatApiKey } = {}) {
   const app = express();
+  app.set('trust proxy', 1); // Render sits behind one proxy; needed for per-visitor rate limits
 
   // Keep the raw body: Meta webhook signature verification needs the exact bytes.
   app.use(
@@ -21,6 +27,10 @@ export function createApp({ handle = handleMessage, chatApiKey = config.chatApiK
   app.get('/health', (_req, res) => res.json({ ok: true }));
 
   app.use('/webhook/messenger', messengerRouter({ handle }));
+
+  // Public web chat: the page at / and its API. No key needed (see channels/web.js guards).
+  app.use('/api/web-chat', webChatRouter({ handle }));
+  app.use(express.static(publicDir));
 
   // Test endpoint for the eval script and QA. Disabled unless CHAT_API_KEY is set.
   app.post('/chat', async (req, res) => {

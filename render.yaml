@@ -26,6 +26,8 @@ services:
         value: "4"
       - key: SIMILARITY_THRESHOLD
         value: "0.60"
+      - key: FACEBOOK_PAGE_URL
+        value: https://m.me/1465752019951388
       - key: GRAPH_API_VERSION
         value: v25.0
       - key: HUMAN_PAUSE_HOURS
