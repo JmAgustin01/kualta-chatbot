@@ -36,7 +36,7 @@ export const config = {
 
   retrieval: {
     topK: num(process.env.TOP_K, 4),
-    similarityThreshold: num(process.env.SIMILARITY_THRESHOLD, 0.35),
+    similarityThreshold: num(process.env.SIMILARITY_THRESHOLD, 0.6),
   },
 
   messenger: {

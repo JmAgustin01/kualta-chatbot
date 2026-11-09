@@ -25,7 +25,7 @@ services:
       - key: TOP_K
         value: "4"
       - key: SIMILARITY_THRESHOLD
-        value: "0.35"
+        value: "0.60"
       - key: GRAPH_API_VERSION
         value: v25.0
       - key: HUMAN_PAUSE_HOURS
